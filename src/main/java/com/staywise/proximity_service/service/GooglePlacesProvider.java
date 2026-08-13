@@ -4,14 +4,21 @@ import com.staywise.proximity_service.client.GooglePlacesClient;
 import com.staywise.proximity_service.dto.AmenityDto;
 import com.staywise.proximity_service.dto.GooglePlacesRequest;
 import com.staywise.proximity_service.dto.GooglePlacesResponse;
+import com.staywise.proximity_service.model.Amenity;
 import com.staywise.proximity_service.model.AmenityCategories;
+import com.staywise.proximity_service.model.PropertyAmenities;
+import com.staywise.proximity_service.model.PropertyAmenityId;
 import com.staywise.proximity_service.repository.AmenityCategoriesRepository;
+import com.staywise.proximity_service.repository.AmenityRepository;
+import com.staywise.proximity_service.repository.PropertyAmenityRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import com.staywise.common.dto.PropertyEventDto;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -23,8 +30,12 @@ import java.util.concurrent.ExecutorService;
 @Primary
 @Slf4j
 public class GooglePlacesProvider implements AmenityProvider{
+
     private final AmenityCategoriesRepository amenityCategoriesRepository;
     private final ExecutorService placesExecutor;
+    private final AmenityRepository amenityRepository;
+    private final PropertyAmenityRepository propertyAmenityRepository;
+    private final AmenityService amenityService;
 
     @Value("${GOOGLE_MAPS_GECODING_API_KEY}")
     String apiKey;
@@ -34,13 +45,15 @@ public class GooglePlacesProvider implements AmenityProvider{
 
     long start = System.nanoTime();
     @Override
-    public List<AmenityDto> getAmenities(double latitude, double longitude, int radiusMeters) {
+    public void getAmenities(PropertyEventDto propertyEventDto,int radiusInMeters) {
        //sequential(latitude,longitude,radiusMeters);
-      return parallelAmenities(latitude,longitude,radiusMeters);
+
+     List<AmenityDto> propertyAmenities= parallelAmenities(propertyEventDto.latitude(),propertyEventDto.longitude(),propertyEventDto.propertyId(),radiusInMeters);
+     amenityService.saveAmenities(propertyAmenities,propertyEventDto);
 
     }
 
-    private List<AmenityDto> parallelAmenities(double latitude, double longitude, int radiusMeters) {
+    private List<AmenityDto> parallelAmenities(double latitude, double longitude,Long propertyId, int radiusMeters) {
         long totalStart = System.nanoTime();
         log.info("Before fetching categories");
         List<AmenityCategories> amenityCategoriesList=amenityCategoriesRepository.findAll();
@@ -102,6 +115,7 @@ public class GooglePlacesProvider implements AmenityProvider{
                 .toList();
 
     }
+
     List<AmenityDto> sequential(Double latitude,Double longitude,int radiusMeters)
     {
         long totalStart = System.nanoTime();

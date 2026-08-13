@@ -131,6 +131,11 @@
 			<groupId>io.github.openfeign</groupId>
 			<artifactId>feign-jackson</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>com.staywise</groupId>
+			<artifactId>staywise-common</artifactId>
+			<version>1.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>

@@ -18,10 +18,10 @@ public class AmenityCategories {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")
-    private Long category_id;
+    private Long categoryId;
 
     @Column(name = "category_name", nullable = false, unique = true)
-    private String category_name;
+    private String categoryName;
 
     @Column(name="google_place_type")
     private String googlePlaceType;
