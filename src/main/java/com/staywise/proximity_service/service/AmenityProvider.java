@@ -6,5 +6,5 @@ import java.util.List;
 
 public interface AmenityProvider {
 
-    public void  getAmenities(PropertyEventDto propertyEventDto,int radiusInMeter);
+    public List<AmenityDto>  fetchPlaces(PropertyEventDto propertyEventDto,int radiusInMeter);
 }

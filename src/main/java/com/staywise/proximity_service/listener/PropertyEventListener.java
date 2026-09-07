@@ -2,6 +2,7 @@ package com.staywise.proximity_service.listener;
 
 import com.staywise.common.dto.PropertyEventDto;
 import com.staywise.proximity_service.service.AmenityProvider;
+import com.staywise.proximity_service.service.AmenityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -12,12 +13,14 @@ import org.springframework.amqp.support.converter.JacksonJsonMessageConverter;
 @Slf4j
 public class PropertyEventListener {
 
-    private final AmenityProvider amenityProvider;
+
+    private final AmenityService amenityService;
 
     @RabbitListener(queues="staywise.property.published.queue")
     public void handlePropertyEvent(PropertyEventDto propertyEventDto)
     {
         log.info("Received property event: {}", propertyEventDto);
-        amenityProvider.getAmenities(propertyEventDto,5000);
+        amenityService.getAmenities(propertyEventDto,5000);
+
     }
 }

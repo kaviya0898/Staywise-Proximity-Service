@@ -1,5 +1,6 @@
 package com.staywise.proximity_service.service;
 
+import ch.hsr.geohash.GeoHash;
 import com.staywise.proximity_service.client.GooglePlacesClient;
 import com.staywise.proximity_service.dto.AmenityDto;
 import com.staywise.proximity_service.dto.GooglePlacesRequest;
@@ -33,9 +34,8 @@ public class GooglePlacesProvider implements AmenityProvider{
 
     private final AmenityCategoriesRepository amenityCategoriesRepository;
     private final ExecutorService placesExecutor;
-    private final AmenityRepository amenityRepository;
     private final PropertyAmenityRepository propertyAmenityRepository;
-    private final AmenityService amenityService;
+
 
     @Value("${GOOGLE_MAPS_GECODING_API_KEY}")
     String apiKey;
@@ -45,11 +45,13 @@ public class GooglePlacesProvider implements AmenityProvider{
 
     long start = System.nanoTime();
     @Override
-    public void getAmenities(PropertyEventDto propertyEventDto,int radiusInMeters) {
+    public List<AmenityDto> fetchPlaces(PropertyEventDto propertyEventDto,int radiusInMeters) {
        //sequential(latitude,longitude,radiusMeters);
+     String propertyGeohash= GeoHash.withCharacterPrecision(propertyEventDto.latitude(),propertyEventDto.longitude(),6)
+                             .toBase32();
+        log.info("Property Geohash: {}", propertyGeohash);
+     return parallelAmenities(propertyEventDto.latitude(),propertyEventDto.longitude(),propertyEventDto.propertyId(),radiusInMeters);
 
-     List<AmenityDto> propertyAmenities= parallelAmenities(propertyEventDto.latitude(),propertyEventDto.longitude(),propertyEventDto.propertyId(),radiusInMeters);
-     amenityService.saveAmenities(propertyAmenities,propertyEventDto);
 
     }
 

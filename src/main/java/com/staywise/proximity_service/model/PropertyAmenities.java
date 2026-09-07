@@ -17,4 +17,7 @@ public class PropertyAmenities {
 
    @Column(nullable = false,name = "distance_meters")
     private Double distanceMeters;
+
+   @Column(nullable = false,name = "geohash")
+    private String geoHash;
 }
